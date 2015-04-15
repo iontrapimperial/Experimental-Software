@@ -1,1 +1,2 @@
 COM3	Quadrant Photodiode Arduino
+COM4	Pulse Box Arduino
