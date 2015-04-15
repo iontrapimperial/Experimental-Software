@@ -20,8 +20,10 @@ boolean firstContact = false;        // Whether we've heard from the microcontro
 int axpos, aypos;    // Axial position
 int rxpos, rypos;  // Radial position
 int mposxrad, mposyrad, mposxax, mposyax; //marker positions
-int width = 1024;
-int height = 1024;
+int width = 512;
+int height = 512;
+int widtha = 512;
+int heighta = 512;
 color adotcolour = color(0, 128, 0);
 color rdotcolour = color(128, 0, 0);
 //PImage bg;
@@ -46,10 +48,10 @@ void setup() {
   atl = 512;
   abl = 512;
   abr = 512;
-  rtr = 512;
-  rtl = 512;
-  rbl = 512;
-  rbr = 512;  
+  rtr = widtha/2;
+  rtl = widtha/2;
+  rbl = widtha/2;
+  rbr = widtha/2;  
 
   title_font = loadFont("Tahoma-Bold-24.vlw");
   num_font = loadFont("Arial-BoldMT-24.vlw");
@@ -131,24 +133,24 @@ void draw() {
   // Crosshairs
   stroke(127);
   strokeWeight(1);
-  line(0, 512, 1024, 512);
-  line(512, 0, 512, 1024);
+  line(0, widtha/2, widtha, widtha/2);
+  line(widtha/2, 0, widtha/2, widtha);
 
   //calculate the coordinates for the beam centre
   axpos = 512 + ((atr + abr) - (atl + abl))/4;
   aypos = 512 - ((atl + atr) - (abl + abr))/4;
 
-  rxpos = 512 + ((rtr + rbr) - (rtl + rbl))/4;
-  rypos = 512 - ((rtl + rtr) - (rbl + rbr))/4;
+  rxpos = (2*widtha + ((rtr + rbr) - (rtl + rbl)))/4;
+  rypos = (2*widtha - ((rtl + rtr) - (rbl + rbr)))/4;
 
   if (framenumber == 0) {
-    DrawAxial();  
+    //DrawAxial();  
     DrawRadial();      
     framenumber = 1;
   }
   else {
     DrawRadial();  
-    DrawAxial();      
+    //DrawAxial();      
     framenumber = 0;
   }
   
@@ -160,22 +162,24 @@ void draw() {
 void DrawMarkers()
 {
   //draw buttons
-  fill( color(128, 255, 0) );  
-  rect(100, 750, 100, 35); //axial button
+  //fill( color(128, 255, 0) );  
+  //rect(100, 750, 100, 35); //axial button
   
-  fill( color(255, 0, 255) );
-  rect(700, 750, 100, 35);  //radial button
+  fill(rdotcolour);
+  rect(3*widtha/4-32, 7*widtha/8-12, 64, 24);  //radial button
   
   fill( color(255, 255, 255) );  
-  text("Mark",150,780);
-  text("Mark",750,780);
+  //text("Mark",150,780);
+  textFont(title_font, 16);
+  textAlign(CENTER, CENTER);
+  text("Mark",3*widtha/4,7*widtha/8);
   
   stroke(255); //bright white
   strokeWeight(3); //3 pixels thick
   
   //axial marker
-  line(mposxax-20, mposyax-20, mposxax+20, mposyax+20);
-  line(mposxax-20, mposyax+20, mposxax+20, mposyax-20);
+  //line(mposxax-20, mposyax-20, mposxax+20, mposyax+20);
+  //line(mposxax-20, mposyax+20, mposxax+20, mposyax-20);
   
   //radial marker
   line(mposxrad-20, mposyrad-20, mposxrad+20, mposyrad+20);
@@ -184,23 +188,24 @@ void DrawMarkers()
   stroke(127);
   strokeWeight(1); //reset lines
   
-  fill( color(128, 255, 0) );  
-  rect(mposxax+20, mposyax+20, 10, 10);
+  //fill( color(128, 255, 0) );  
+  //rect(mposxax+20, mposyax+20, 10, 10);
   
   fill( color(255, 0, 255) );
-  rect(mposxrad+20, mposyrad+20, 10, 10);
+  rect(mposxrad+10, mposyrad+10, 4, 4);
 }
 
 
 void mousePressed()
 {
   //is mouse over axial button?
-  if(overRect(100, 750, 100, 35)) 
-  {
-      mposxax =  axpos ;
-      mposyax = aypos;
-  }
-  else if(overRect(700, 750, 100, 35))
+  //if(overRect(100, 750, 100, 35)) 
+  //{
+  //    mposxax =  axpos ;
+  //    mposyax = aypos;
+  //}
+  //else 
+  if(overRect(3*widtha/4-32, 7*widtha/8-12, 64, 24))
   {
       mposxrad =  rxpos ;
       mposyrad = rypos;
@@ -256,29 +261,35 @@ void DrawRadial() {
   /////////////////////////////////  
   // Draw the radial display
   fill(rdotcolour);
-  textFont(num_font, 48);
+  textFont(num_font, 24);
+  textAlign(CENTER, CENTER);
   // Print the absolute intensities:
-  text(rtr, 700, 300);    // Radial Top Right
-  text(rtl, 300, 300);
-  text(rbl, 300, 700);
-  text(rbr, 700, 700);
-
-  text("rxpos", 710, 950);
-  text(rxpos, 710, 920);
-  text("rypos", 890, 950);
-  text(rypos, 890, 920);
-
+  text(rtr, 3*widtha/4, widtha/4);    // Radial Top Right
+  text(rtl, widtha/4, widtha/4);
+  text(rbl, widtha/4, 3*widtha/4);
+  text(rbr, 3*widtha/4, 3*widtha/4);
+  
   // Total intensity
   int r_total = rtr + rtl + rbr + rbl;
-  text(r_total, 800, 870);
+  textFont(num_font, 16);
+  textAlign(CENTER, CENTER);
+  text("Total: ", widtha/4-24, 7*widtha/8);
+  text(r_total, widtha/4+24, 7*widtha/8);
+
+  textFont(num_font, 16);
+  textAlign(CENTER, CENTER);
+  text("x pos", widtha/4-32, 7.5*widtha/8);
+  text(rxpos, widtha/4-32, 7.75*widtha/8);
+  text("y pos", widtha/4+32, 7.5*widtha/8);
+  text(rypos, widtha/4+32, 7.75*widtha/8);
 
   // Moving circle
-  ellipse(rxpos, rypos, 25, 25);
+  ellipse(rxpos, rypos, 16, 16);
 
   // Text label
-  textAlign(CENTER);
-  textFont(title_font, 32);
-  text("Radial Detector", 800, 830);
+  //textAlign(CENTER);
+  //textFont(title_font, 32);
+  //text("Radial Detector", 800, 830);
 }
 
 
