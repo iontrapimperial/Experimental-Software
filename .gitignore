@@ -163,3 +163,4 @@ $RECYCLE.BIN/
 [Aa]pplication.linux64/
 [Aa]pplication.Windows32/
 [Aa]pplication.windows64/
+*.vlw
