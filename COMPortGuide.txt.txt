@@ -1,3 +1,0 @@
-COM3	Quadrant Photodiode Arduino
-COM4	Pulse Box Arduino
-COM6	Lock Logic Arduino

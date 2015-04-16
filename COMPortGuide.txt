@@ -1,0 +1,7 @@
+These are what each of the COM ports on the main experiment computer do
+
+COM3	Quadrant photodiode Arduino
+COM4	Pulse box Arduino
+COM5	FPGA
+COM6	Lock logic Arduino
+COM8	Newport mirror mount controller

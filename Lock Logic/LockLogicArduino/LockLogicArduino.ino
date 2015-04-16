@@ -114,7 +114,7 @@ void loop() {
     }
    
     Serial.write(OutputByte);
-    delay(500); 
+    delay(100); 
   }
 }
 
