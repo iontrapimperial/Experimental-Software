@@ -2,7 +2,9 @@
 // Writen by Graham //
 //////////////////////
 
-Pulse box
+Pulse box. Does short pulses.
+
+This should use port addressing as it is faster.
 /////////////////// */
 
 const int pulse_output_pin = 12;
