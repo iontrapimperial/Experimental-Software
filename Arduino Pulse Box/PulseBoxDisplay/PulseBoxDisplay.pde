@@ -49,7 +49,7 @@ void setup() {
   
   println(Serial.list());
 
-  myPort = new Serial(this, "COM4", 9600);
+  myPort = new Serial(this, "COM7", 9600);
   
   myPort.write('A');
   
