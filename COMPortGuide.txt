@@ -5,3 +5,4 @@ COM4	Pulse box Arduino
 COM5	FPGA
 COM6	Lock logic Arduino
 COM8	Newport mirror mount controller
+COM12	Spectroscopy DDS controller
