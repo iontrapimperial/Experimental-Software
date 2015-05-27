@@ -7,7 +7,6 @@ Pulse box. Does short pulses.
 This should use port addressing as it is faster.
 /////////////////// */
 
-const int pulse_output_pin = 12;
 const int pulse_button_pin = 2;
 
 int pulse_length = 5;
@@ -17,9 +16,9 @@ volatile boolean do_a_pulse = false;
 
 void pulse(unsigned int pl)
 {
-  digitalWrite(pulse_output_pin, HIGH);
+  PORTB = 255;      // LD, WR HIGH
   delayMicroseconds(pl);
-  digitalWrite(pulse_output_pin, LOW);
+  PORTB = 0;      // LD, WR LOW
   delay(1);
   do_a_pulse = false;
 }
@@ -35,10 +34,8 @@ void setup()
 {  
   attachInterrupt(0, pulse_button_press, FALLING);
   
-  pinMode(pulse_output_pin, OUTPUT);
+  DDRB = 255; //Can use any PORT B pin as pulse output. Currently wired up to pin 12.
   pinMode(pulse_button_pin, INPUT_PULLUP);
-  
-  digitalWrite(pulse_output_pin, LOW);
   
   Serial.begin(9600);
   establish_contact();
@@ -85,7 +82,7 @@ void loop()
   if(do_a_pulse) pulse(pulse_length);
 }
 
-// Interupt functions
+// Interrupt functions
 
 void pulse_button_press()
 {
