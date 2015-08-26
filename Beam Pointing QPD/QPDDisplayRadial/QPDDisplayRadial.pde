@@ -14,6 +14,8 @@
 import processing.serial.*;
 Serial myPort;                       // The serial port
 int[] serialInArray = new int[16];    // Where we'll put what we receive
+int avgArraySize = 20;
+int[] rPosYarray = new int [avgArraySize];
 int serialCount = 0;                 // A count of how many bytes we receive
 boolean firstContact = false;        // Whether we've heard from the microcontroller
 
@@ -53,6 +55,9 @@ void setup() {
   rbl = widtha/2;
   rbr = widtha/2;  
 
+  for(int i =0;i<avgArraySize;i++){
+    rPosYarray[i]=0;
+  }
   title_font = loadFont("Tahoma-Bold-24.vlw");
   num_font = loadFont("Arial-BoldMT-24.vlw");
 
@@ -99,19 +104,27 @@ void serialEvent(Serial myPort) {
 
     // If we have 16 bytes:
     if (serialCount > 15 ) {
+      
       rbr = 1024 - (serialInArray[0] + serialInArray[1]*256); //Into analog A08
       rtr = 1024 - (serialInArray[2] + serialInArray[3]*256); //Into analog A09
       rbl = 1024 - (serialInArray[4] + serialInArray[5]*256); //Into analog A10
       rtl = 1024 - (serialInArray[6] + serialInArray[7]*256); //Into analog A11
-
-      atl = 1024 - (serialInArray[8] + serialInArray[9]*256); 
-      atr = 1024 - (serialInArray[10] + serialInArray[11]*256); 
-      abr = 1024 - (serialInArray[12] + serialInArray[13]*256); 
-      abl = 1024 - (serialInArray[14] + serialInArray[15]*256); 
-
+     
+     /*
+      rtl = 1024 - (serialInArray[8] + serialInArray[9]*256); 
+      rtr = 1024 - (serialInArray[10] + serialInArray[11]*256); 
+      rbr = 1024 - (serialInArray[12] + serialInArray[13]*256); 
+      rbl = 1024 - (serialInArray[14] + serialInArray[15]*256); 
+     
+      rtr = 1024 - (serialInArray[8] + serialInArray[9]*256); 
+      rbr = 1024 - (serialInArray[10] + serialInArray[11]*256); 
+      rtl = 1024 - (serialInArray[12] + serialInArray[13]*256); 
+      rbl = 1024 - (serialInArray[14] + serialInArray[15]*256);
+     */
       //These numbers are set by the way the photodiode and the hardware boxes are linked to the analog inputs
       // print the values (for debugging purposes only):
-      // println(serialInArray[0] + "\t" + serialInArray[1] + "\t" + serialInArray[2] + "\t" + serialInArray[3] + "\t" + serialInArray[4] + "\t" + serialInArray[5] + "\t" + serialInArray[6] + "\t" + serialInArray[7]);
+      println("Radial "+ serialInArray[0] + "\t" + serialInArray[1] + "\t" + serialInArray[2] + "\t" + serialInArray[3] + "\t" + serialInArray[4] + "\t" + serialInArray[5] + "\t" + serialInArray[6] + "\t" + serialInArray[7]);
+     // println("Axial "+serialInArray[8] + "\t" + serialInArray[9] + "\t" + serialInArray[10] + "\t" + serialInArray[11] + "\t" + serialInArray[12] + "\t" + serialInArray[13] + "\t" + serialInArray[14] + "\t" + serialInArray[15]);
       println(rbr + "\t" + rtr + "\t" + rbl + "\t" + rtl);
       // Send a capital A to request new sensor readings:
       myPort.write('A');
@@ -141,7 +154,14 @@ void draw() {
   aypos = 512 - ((atl + atr) - (abl + abr))/4;
 
   rxpos = (2*widtha + ((rtr + rbr) - (rtl + rbl)))/4;
-  rypos = (2*widtha - ((rtl + rtr) - (rbl + rbr)))/4;
+  //rypos = (2*widtha - ((rtl + rtr) - (rbl + rbr)))/4;
+  int ryposTemp =0;
+  for(int i = 0;i<avgArraySize-1;i++){
+   ryposTemp += rPosYarray[i];
+   rPosYarray[i]=rPosYarray[i+1]; 
+  }
+  rPosYarray[avgArraySize-1]=(2*widtha - ((rtl + rtr) - (rbl + rbr)))/4;
+  rypos = (ryposTemp +rPosYarray[avgArraySize-1])/(avgArraySize);
 
   if (framenumber == 0) {
     //DrawAxial();  
