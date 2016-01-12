@@ -30,7 +30,7 @@ int RSCoff = 39;
 int S29PDHon = 37;
 int S29PDHoff = 35;
 
-byte OutputByte = B00000000;
+byte OutputByte = B00010001;
 int InputByte = 0;         // incoming serial byte
 
 // the setup routine runs once when you press reset:
@@ -97,7 +97,7 @@ void loop() {
         OutputByte = OutputByte & B11111011;
       }
       if(digitalRead(RSCin)) {
-        OutputByte = OutputByte | B00000100;
+        OutputByte = OutputByte | B00001000;
       }
       else {
         OutputByte = OutputByte & B11110111;

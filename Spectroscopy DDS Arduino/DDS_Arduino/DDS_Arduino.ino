@@ -19,16 +19,16 @@ const byte CFR1[4] = {0b00000000, 0b00000000, 0b00000000, 0b00000000}; // defaul
 const byte CFR2[4] = {0b00000001, 0b01000000, 0b00001000, 0b00100000}; // amplitude scale factor enabled
 const byte CFR3[4] = {0b00011111, 0b00111111, 0b11000000, 0b00000000}; // divider bypassed
 
-const byte defProfile[8] = {0b00101110, 0b10101010, 0, 0, 58, 225, 71, 174};
+const byte defProfile[8] = {0b00101110, 0b10101010, 0, 0, 65, 71, 174, 20};
 
-byte STP0[8] = {0b00101110, 0b10101010, 0, 0, 58, 225, 71, 174}; 
-byte STP1[8] = {0b00101110, 0b10101010, 0, 0, 58, 225, 71, 174}; 
-byte STP2[8] = {0b00101110, 0b10101010, 0, 0, 58, 225, 71, 174};
-byte STP3[8] = {0b00101110, 0b10101010, 0, 0, 58, 225, 71, 174}; // initialisation of the profile registers
-byte STP4[8] = {0b00101110, 0b10101010, 0, 0, 58, 225, 71, 174}; // 33 dBm
-byte STP5[8] = {0b00101110, 0b10101010, 0, 0, 58, 225, 71, 174}; 
-byte STP6[8] = {0b00101110, 0b10101010, 0, 0, 58, 225, 71, 174}; 
-byte STP7[8] = {0b00101110, 0b10101010, 0, 0, 58, 225, 71, 174};
+byte STP0[8] = {0b00101110, 0b10101010, 0, 0, 65, 71, 174, 20}; 
+byte STP1[8] = {0b00101110, 0b10101010, 0, 0, 65, 71, 174, 20}; 
+byte STP2[8] = {0b00101110, 0b10101010, 0, 0, 65, 71, 174, 20};
+byte STP3[8] = {0b00101110, 0b10101010, 0, 0, 65, 71, 174, 20}; // initialisation of the profile registers
+byte STP4[8] = {0b00101110, 0b10101010, 0, 0, 65, 71, 174, 20}; // 33 dBm
+byte STP5[8] = {0b00101110, 0b10101010, 0, 0, 65, 71, 174, 20}; 
+byte STP6[8] = {0b00101110, 0b10101010, 0, 0, 65, 71, 174, 20}; 
+byte STP7[8] = {0b00101110, 0b10101010, 0, 0, 65, 71, 174, 20};
 
 void setup()
 { 
@@ -55,7 +55,7 @@ void setup()
   Serial.begin(9600); // maximum working Baud rate for some reason
   
   SPI.begin(); // start SPI communication
-  SPI.setClockDivider(SPI_CLOCK_DIV2); // maximum rate, frequency of the synchronisation clock (8 MHz)
+  SPI.setClockDivider(SPI_CLOCK_DIV4);
   SPI.setBitOrder(MSBFIRST); // most sigificant bit first
   SPI.setDataMode(SPI_MODE0); // the logic level has to be on the rising edge of the clock
   
@@ -122,7 +122,7 @@ void loop()
     while(check ==1 && i < 64);
        
     Serial.println(check); // handshake
-    
+       
     int reset = 0;
     int j = 0;
     
@@ -276,7 +276,27 @@ void loop()
         WriteRegister8(0b00010101, STP7[0], STP7[1], STP7[2], STP7[3], STP7[4], STP7[5], STP7[6], STP7[7]);
       }
       
-      SendUpdate(); 
+      long profile0FTW = STP0[4];
+      profile0FTW = profile0FTW * 256 + STP0[5];
+      profile0FTW = profile0FTW * 256 + STP0[6];
+      profile0FTW = profile0FTW * 256 + STP0[7];
+      
+      long profile4FTW = STP4[4];
+      profile4FTW = profile4FTW * 256 + STP4[5];
+      profile4FTW = profile4FTW * 256 + STP4[6];
+      profile4FTW = profile4FTW * 256 + STP4[7];
+      
+      long profile7FTW = STP7[4];
+      profile7FTW = profile7FTW * 256 + STP7[5];
+      profile7FTW = profile7FTW * 256 + STP7[6];
+      profile7FTW = profile7FTW * 256 + STP7[7];
+      
+      //long profile7FTW= (STP7[4] << 24) + (STP7[5] << 16) + (STP7[6] << 8) + (STP7[7]);
+      Serial.println(profile0FTW);
+      Serial.println(profile4FTW);
+      //Serial.println(profile7FTW);
+      
+      SendUpdate();
     }
   }
 }

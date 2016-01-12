@@ -14,8 +14,8 @@
 import processing.serial.*;
 Serial myPort;                       // The serial port
 int[] serialInArray = new int[16];    // Where we'll put what we receive
-int avgArraySize = 20;
-int[] rPosYarray = new int [avgArraySize];
+int avgArraySize = 10;
+float[] rPosYarray = new float [avgArraySize];
 int serialCount = 0;                 // A count of how many bytes we receive
 boolean firstContact = false;        // Whether we've heard from the microcontroller
 
@@ -31,7 +31,7 @@ color rdotcolour = color(128, 0, 0);
 //PImage bg;
 color bg = color(255,255,255);
 int atl, atr, abl, abr;
-int rtl, rtr, rbl, rbr;
+int rtl, rtr, rbl, rbr, sumintensity;
 PFont title_font;
 PFont num_font;
 int framenumber = 0;
@@ -109,18 +109,8 @@ void serialEvent(Serial myPort) {
       rtr = 1024 - (serialInArray[2] + serialInArray[3]*256); //Into analog A09
       rbl = 1024 - (serialInArray[4] + serialInArray[5]*256); //Into analog A10
       rtl = 1024 - (serialInArray[6] + serialInArray[7]*256); //Into analog A11
-     
-     /*
-      rtl = 1024 - (serialInArray[8] + serialInArray[9]*256); 
-      rtr = 1024 - (serialInArray[10] + serialInArray[11]*256); 
-      rbr = 1024 - (serialInArray[12] + serialInArray[13]*256); 
-      rbl = 1024 - (serialInArray[14] + serialInArray[15]*256); 
-     
-      rtr = 1024 - (serialInArray[8] + serialInArray[9]*256); 
-      rbr = 1024 - (serialInArray[10] + serialInArray[11]*256); 
-      rtl = 1024 - (serialInArray[12] + serialInArray[13]*256); 
-      rbl = 1024 - (serialInArray[14] + serialInArray[15]*256);
-     */
+    sumintensity=rbr+rtr+rbl+rtl;
+   
       //These numbers are set by the way the photodiode and the hardware boxes are linked to the analog inputs
       // print the values (for debugging purposes only):
       println("Radial "+ serialInArray[0] + "\t" + serialInArray[1] + "\t" + serialInArray[2] + "\t" + serialInArray[3] + "\t" + serialInArray[4] + "\t" + serialInArray[5] + "\t" + serialInArray[6] + "\t" + serialInArray[7]);
@@ -153,16 +143,33 @@ void draw() {
   axpos = 512 + ((atr + abr) - (atl + abl))/4;
   aypos = 512 - ((atl + atr) - (abl + abr))/4;
 
-  rxpos = (2*widtha + ((rtr + rbr) - (rtl + rbl)))/4;
-  //rypos = (2*widtha - ((rtl + rtr) - (rbl + rbr)))/4;
-  int ryposTemp =0;
+  //rxpos = (2*widtha + ((rtr + rbr) - (rtl + rbl)))/4;
+  float abs = 0;
+  float ord =0;
+  float TR = rtr;
+  float TL = rtl;
+  float BR = rbr;
+  float BL = rbl;
+  if(TR+TL+BL+BR!=0)
+  {
+    //abs = widtha/2 + ((TR-TL)/(TR+TL)+(BR-BL)/(BR+BL))*widtha/4;
+    abs = widtha/2 + (TR+BR-TL-BL)/(TR+BR+TL+BL)*widtha/4;
+    ord = widtha/2 - (TR+TL-BR-BL)/(TR+BR+TL+BL)*widtha/4;
+  }
+  else abs = 0;
+  println(abs);
+  rxpos = round(abs);
+  //rypos = round(ord);
+  
+  float ryposTemp =0;
   for(int i = 0;i<avgArraySize-1;i++){
    ryposTemp += rPosYarray[i];
    rPosYarray[i]=rPosYarray[i+1]; 
   }
-  rPosYarray[avgArraySize-1]=(2*widtha - ((rtl + rtr) - (rbl + rbr)))/4;
-  rypos = (ryposTemp +rPosYarray[avgArraySize-1])/(avgArraySize);
-
+  rPosYarray[avgArraySize-1]=ord;
+  rypos = round((ryposTemp +rPosYarray[avgArraySize-1])/(avgArraySize));
+  
+  //rypos = (2*widtha - ((rtl + rtr) - (rbl + rbr)))/4;
   if (framenumber == 0) {
     //DrawAxial();  
     DrawRadial();      
